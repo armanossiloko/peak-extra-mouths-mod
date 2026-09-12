@@ -231,3 +231,6 @@ Config.Build.user.props
 # IDE / OS
 .DS_Store
 Thumbs.db
+
+.gamelibs/
+peakgamelibs.nupkg

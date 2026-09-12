@@ -51,35 +51,40 @@ After one launch, edit:
 
 ## Build
 
-Requires [PEAK](https://store.steampowered.com/app/3527290/PEAK/) installed so game assemblies can be referenced.
+Requires [PEAK](https://store.steampowered.com/app/3527290/PEAK/) installed (auto-detected under common Steam paths), or set `PEAK_GAME_DIR` / `-p:PeakGameRootDir=`.
 
 ```bash
 dotnet build -c Release
 ```
 
-The build auto-detects PEAK under common Steam library locations. If it cannot find the game, set one of:
+Optional deploy: `-p:DeployToPeak=true -p:PeakPluginsDir="/path/to/BepInEx/plugins/ExtraMouths"`  
+Optional overrides: copy `Config.Build.user.props.example` → `Config.Build.user.props` (gitignored).
+
+## Thunderstore packaging (CI)
+
+Every push to `master` runs [.github/workflows/thunderstore.yml](.github/workflows/thunderstore.yml):
+
+1. Builds a Thunderstore ZIP (using stripped [PEAKGameLibs](https://www.nuget.org/packages/PEAKGameLibs) for compile references)
+2. Uploads it as a workflow **artifact** you can download and upload manually
+
+### Manual publish from Actions
+
+1. Actions → **Thunderstore** → **Run workflow**
+2. Enable **Publish the package to Thunderstore**
+3. Requires repo secret `TCLI_AUTH_TOKEN` (Thunderstore team → Service Accounts)
+
+### Auto-publish on every master push
+
+1. Add secret `TCLI_AUTH_TOKEN`
+2. Add repository variable `AUTO_PUBLISH_THUNDERSTORE` = `true`
+
+Without that variable, pushes only build artifacts (safe default).
+
+### Local package build
 
 ```bash
-# Environment variable (recommended)
-export PEAK_GAME_DIR="/path/to/Steam/steamapps/common/PEAK"
-
-# Or pass MSBuild property
-dotnet build -c Release -p:PeakGameRootDir="/path/to/Steam/steamapps/common/PEAK"
-```
-
-Optional local overrides (gitignored): copy `Config.Build.user.props.example` to `Config.Build.user.props`.
-
-Optional deploy into a BepInEx plugins folder after build:
-
-```bash
-dotnet build -c Release -p:DeployToPeak=true -p:PeakPluginsDir="/path/to/BepInEx/plugins/ExtraMouths"
-```
-
-Thunderstore package:
-
-```bash
-./build.sh
-# or: dotnet build -c Release -target:PackTS -v d
+dotnet build -c Release -target:PackTS
+# zip lands in artifacts/thunderstore/
 ```
 
 ## Credits

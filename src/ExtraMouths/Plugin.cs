@@ -31,20 +31,34 @@ public partial class Plugin : BaseUnityPlugin
     /// (coconuts, winterberries, kingberries, clusterberries, mushrooms, etc.).
     /// Luggage and campfire pools are intentionally excluded.
     /// </summary>
-    private static readonly HashSet<SpawnPool> FoodPools =
+    private static readonly HashSet<SpawnPool> FoodPools = BuildFoodPools(
     [
-        SpawnPool.MushroomCluster,
-        SpawnPool.BerryBushBeach,
-        SpawnPool.BerryBushJungle,
-        SpawnPool.SpikyVine,
-        SpawnPool.CoconutTree,
-        SpawnPool.WillowTreeJungle,
-        SpawnPool.JungleVine,
-        SpawnPool.WinterberryTree,
-        SpawnPool.Nest,
-        SpawnPool.Cactus,
-        SpawnPool.Redwood,
-    ];
+        "MushroomCluster",
+        "BerryBushBeach",
+        "BerryBushJungle",
+        "SpikyVine",
+        "CoconutTree",
+        "WillowTreeJungle",
+        "JungleVine",
+        "WinterberryTree",
+        "Nest",
+        "Cactus",
+        "Redwood",
+    ]);
+
+    private static HashSet<SpawnPool> BuildFoodPools(IEnumerable<string> names)
+    {
+        var set = new HashSet<SpawnPool>();
+        foreach (var name in names)
+        {
+            if (Enum.TryParse(name, ignoreCase: false, out SpawnPool pool))
+            {
+                set.Add(pool);
+            }
+        }
+
+        return set;
+    }
 
     private void Awake()
     {

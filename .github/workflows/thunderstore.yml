@@ -1,0 +1,79 @@
+name: Thunderstore
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish the package to Thunderstore (requires TCLI_AUTH_TOKEN secret)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Download stripped PEAKGameLibs (CI references)
+        run: |
+          set -euo pipefail
+          mkdir -p .gamelibs
+          curl -fsSL "https://api.nuget.org/v3-flatcontainer/peakgamelibs/1.0.1/peakgamelibs.1.0.1.nupkg" -o peakgamelibs.nupkg
+          unzip -q peakgamelibs.nupkg -d .gamelibs-nupkg
+          cp -r .gamelibs-nupkg/lib/. .gamelibs/
+          test -f .gamelibs/Assembly-CSharp.dll
+          echo "ManagedDir=$PWD/.gamelibs"
+
+      - name: Build Thunderstore package
+        run: |
+          set -euo pipefail
+          MANAGED_DIR="$PWD/.gamelibs"
+          # Disable local publicizer path quirks; PEAKGameLibs is already stripped/publicized.
+          dotnet build ExtraMouths.slnx -c Release -target:PackTS -v m \
+            -p:ManagedDir="$MANAGED_DIR/" \
+            -p:PeakGameRootDir=""
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: thunderstore-package
+          path: artifacts/thunderstore/*.zip
+          if-no-files-found: error
+
+      - name: Publish to Thunderstore
+        if: ${{ (github.event_name == 'workflow_dispatch' && inputs.publish) || (github.event_name == 'push' && vars.AUTO_PUBLISH_THUNDERSTORE == 'true') }}
+        env:
+          TCLI_AUTH_TOKEN: ${{ secrets.TCLI_AUTH_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${TCLI_AUTH_TOKEN:-}" ]; then
+            echo "TCLI_AUTH_TOKEN secret is not set. Skipping publish."
+            echo "Add it under Repo Settings → Secrets, from your Thunderstore team Service Account."
+            exit 1
+          fi
+          MANAGED_DIR="$PWD/.gamelibs"
+          dotnet build ExtraMouths.slnx -c Release -target:PackTS -v m \
+            -p:ManagedDir="$MANAGED_DIR/" \
+            -p:PeakGameRootDir="" \
+            -p:PublishTS=true
+
+      - name: Attach package to GitHub Release (tag pushes / manual)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "build-${{ github.run_number }}"
+          name: "Thunderstore build ${{ github.run_number }}"
+          files: artifacts/thunderstore/*.zip
+          generate_release_notes: true
+          draft: true
