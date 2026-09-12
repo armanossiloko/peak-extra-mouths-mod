@@ -95,7 +95,7 @@ public partial class Plugin : BaseUnityPlugin
             "Spawners",
             "Luggages",
             "",
-            "Optional: comma-separated luggage display names to also multiply (e.g. \"Luggage,Big Luggage,Explorer's Luggage\"). Empty = luggage untouched.");
+            "Optional: comma-separated luggage display names to also multiply. Example without quotes: Luggage,Big Luggage,Explorer's Luggage. Also: Ancient Luggage, Ancient Statue, Clown Luggage. Do not wrap the whole value in quotation marks. Empty = luggage untouched.");
 
         luggageSet = BuildLuggageSet(Luggages.Value);
         Luggages.SettingChanged += (_, _) => luggageSet = BuildLuggageSet(Luggages.Value);

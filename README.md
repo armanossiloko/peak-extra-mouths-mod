@@ -42,7 +42,28 @@ After one launch, edit:
 | `BaselinePlayers` | `4` | Vanilla balance party size |
 | `MinPlayersToScale` | `5` | Below this → full vanilla rates |
 | `BerryBushes` / `BerryVines` / `GroundSpawns` / `FoodSpawnPools` | `true` | Toggle food categories |
-| `Luggages` | empty | Optional luggage display names to multiply |
+| `Luggages` | empty | Optional luggage display names to multiply (see below) |
+
+### Luggage names (`Luggages`)
+
+Comma-separated **exact** prefab display names. Do **not** wrap the value in quotation marks in the `.cfg` (quotes become part of the name and only middle entries like `Big Luggage` will match).
+
+```text
+Luggage,Big Luggage,Explorer's Luggage
+```
+
+Known vanilla names:
+
+| Display name | Notes |
+|---|---|
+| `Luggage` | Regular / small luggage |
+| `Big Luggage` | Tall white luggage |
+| `Explorer's Luggage` | Orange explorer briefcase (straight apostrophe `'`) |
+| `Ancient Luggage` | Ancient luggage |
+| `Ancient Statue` | Respawn statues (also a luggage spawner) |
+| `Clown Luggage` | Clown luggage |
+
+There is no public PEAK API or official name list; these come from the game’s Luggage `displayName` fields.
 
 ## Install
 
