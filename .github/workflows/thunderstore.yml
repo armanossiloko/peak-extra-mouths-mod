@@ -59,8 +59,8 @@ jobs:
       - name: Upload Thunderstore-ready artifact
         uses: actions/upload-artifact@v4
         with:
-          # Downloaded filename will be ExtraMouths-ExtraMouths.zip — upload that to Thunderstore.
-          name: ExtraMouths-ExtraMouths
+          # Downloaded filename will be FakeGameDevelopers-ExtraMouths.zip — upload that to Thunderstore.
+          name: FakeGameDevelopers-ExtraMouths
           path: ts-artifact/*
           if-no-files-found: error
 

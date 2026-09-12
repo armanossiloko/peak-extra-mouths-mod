@@ -5,7 +5,7 @@ schemaVersion = "0.1.0"
 repository = "https://thunderstore.io"
 
 [package]
-namespace = "ExtraMouths"
+namespace = "FakeGameDevelopers"
 name = "ExtraMouths"
 description = "Scales PEAK forage food for lobbies larger than 4 players (+2 mouths)."
 websiteUrl = "https://github.com/armanossiloko/peak-extra-mouths-mod"
@@ -35,4 +35,4 @@ target = "/"
 communities = [ "peak", ]
 
 [publish.categories]
-peak = [ "mods", ]
+peak = [ "mods", "host-only", "quality-of-life" ]
