@@ -1,0 +1,38 @@
+[config]
+schemaVersion = "0.1.0"
+
+[general]
+repository = "https://thunderstore.io"
+
+[package]
+namespace = "ExtraMouths"
+name = "ExtraMouths"
+description = "Scales PEAK forage food for lobbies larger than 4 players (+2 mouths)."
+websiteUrl = "https://github.com/armanossiloko/peak-extra-mouths-mod"
+containsNsfwContent = false
+
+[package.dependencies]
+BepInEx-BepInExPack_PEAK = "5.4.2403"
+
+[build]
+icon = "../../icon.png"
+readme = "../../README.md"
+outdir = "../../artifacts/thunderstore/"
+
+[[build.copy]]
+source = "../../artifacts/bin/ExtraMouths/release/ExtraMouths.dll"
+target = "plugins/"
+
+[[build.copy]]
+source = "../../CHANGELOG.md"
+target = "/"
+
+[[build.copy]]
+source = "../../LICENSE"
+target = "/"
+
+[publish]
+communities = [ "peak", ]
+
+[publish.categories]
+peak = [ "mods", ]

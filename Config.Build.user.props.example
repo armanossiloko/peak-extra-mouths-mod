@@ -1,0 +1,15 @@
+<Project>
+  <!--
+    Optional local overrides. Copy this file to Config.Build.user.props (gitignored).
+
+    Example (Windows):
+      <PeakGameRootDir>D:\SteamLibrary\steamapps\common\PEAK\</PeakGameRootDir>
+      <DeployToPeak>true</DeployToPeak>
+      <PeakPluginsDir>C:\path\to\BepInEx\plugins\ExtraMouths\</PeakPluginsDir>
+  -->
+  <PropertyGroup>
+    <!-- <PeakGameRootDir></PeakGameRootDir> -->
+    <!-- <DeployToPeak>true</DeployToPeak> -->
+    <!-- <PeakPluginsDir></PeakPluginsDir> -->
+  </PropertyGroup>
+</Project>

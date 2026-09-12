@@ -1,0 +1,45 @@
+<Project>
+  <!--
+    Shared configuration for all projects in this repo.
+    Optional local overrides: copy Config.Build.user.props.example → Config.Build.user.props (gitignored).
+  -->
+
+  <Import
+    Project="$(MSBuildThisFileDirectory)Config.Build.user.props"
+    Condition="Exists('$(MSBuildThisFileDirectory)Config.Build.user.props')"
+  />
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SolutionRoot>$(MSBuildThisFileDirectory)</SolutionRoot>
+
+    <!-- Prefer an explicit property, then PEAK_GAME_DIR env var. -->
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' == '' and '$(PEAK_GAME_DIR)' != ''">$(PEAK_GAME_DIR)</PeakGameRootDir>
+
+    <!-- Common Steam install locations (first existing wins). -->
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' == '' and Exists('$(MSBuildProgramFiles32)Steam\steamapps\common\PEAK\PEAK.exe')">$(MSBuildProgramFiles32)Steam\steamapps\common\PEAK\</PeakGameRootDir>
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' == '' and Exists('C:\Program Files (x86)\Steam\steamapps\common\PEAK\PEAK.exe')">C:\Program Files (x86)\Steam\steamapps\common\PEAK\</PeakGameRootDir>
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' == '' and Exists('D:\Program Files (x86)\Steam\steamapps\common\PEAK\PEAK.exe')">D:\Program Files (x86)\Steam\steamapps\common\PEAK\</PeakGameRootDir>
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' == '' and Exists('D:\SteamLibrary\steamapps\common\PEAK\PEAK.exe')">D:\SteamLibrary\steamapps\common\PEAK\</PeakGameRootDir>
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' == '' and Exists('E:\SteamLibrary\steamapps\common\PEAK\PEAK.exe')">E:\SteamLibrary\steamapps\common\PEAK\</PeakGameRootDir>
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' == '' and Exists('$(HOME)/.local/share/Steam/steamapps/common/PEAK/PEAK.exe')">$(HOME)/.local/share/Steam/steamapps/common/PEAK/</PeakGameRootDir>
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' == '' and Exists('$(HOME)/.steam/steam/steamapps/common/PEAK/PEAK.exe')">$(HOME)/.steam/steam/steamapps/common/PEAK/</PeakGameRootDir>
+
+    <PeakGameRootDir Condition="'$(PeakGameRootDir)' != ''">$([MSBuild]::EnsureTrailingSlash($(PeakGameRootDir)))</PeakGameRootDir>
+    <ManagedDir Condition="'$(PeakGameRootDir)' != ''">$(PeakGameRootDir)PEAK_Data\Managed\</ManagedDir>
+
+    <!-- Default plugins path is unused unless DeployToPeak=true -->
+    <PeakPluginsDir Condition="'$(PeakPluginsDir)' == '' and '$(PeakGameRootDir)' != ''">$(PeakGameRootDir)BepInEx\plugins\ExtraMouths\</PeakPluginsDir>
+  </PropertyGroup>
+</Project>

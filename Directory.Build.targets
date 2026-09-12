@@ -1,0 +1,69 @@
+<Project>
+  <PropertyGroup>
+    <RestoreAdditionalProjectSources>
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.windows10ce.com/nuget/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.Core" Version="5.4.21" />
+    <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3" PrivateAssets="all" />
+    <PackageReference Include="Hamunii.BepInEx.AutoPlugin" Version="2.0.*" PrivateAssets="all" />
+  </ItemGroup>
+
+  <!-- Fallback Unity stubs only when PEAK Managed is missing (build will still fail without game types). -->
+  <ItemGroup Condition="'$(ManagedDir)' == '' or !Exists('$(ManagedDir)')">
+    <PackageReference Include="UnityEngine.Modules" Version="6000.0.36" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="EnsurePeakManagedAssemblies" BeforeTargets="ResolveAssemblyReferences">
+    <Error
+      Text="PEAK game assemblies not found. Install PEAK, or set PEAK_GAME_DIR / -p:PeakGameRootDir= to your PEAK folder (the one containing PEAK.exe)."
+      Condition="'$(ManagedDir)' == '' or !Exists('$(ManagedDir)Assembly-CSharp.dll')"
+    />
+  </Target>
+
+  <ItemGroup Condition="'$(ManagedDir)' != '' and Exists('$(ManagedDir)')">
+    <LocalReferences
+      Include="$(ManagedDir)*.dll"
+      Exclude="$(ManagedDir)Mono*.dll;$(ManagedDir)netstandard.dll;$(ManagedDir)System*.dll;$(ManagedDir)mscorlib.dll"
+    />
+    <Reference Include="@(LocalReferences)" Private="false" />
+    <Reference Include="$(ManagedDir)Assembly-CSharp.dll" Private="false" Publicize="true" />
+  </ItemGroup>
+
+  <!--
+    Optional: copy the built DLL into a BepInEx plugins folder.
+    Example: dotnet build -c Release -p:DeployToPeak=true -p:PeakPluginsDir="C:\...\BepInEx\plugins\ExtraMouths"
+  -->
+  <Target Name="DeployToPeakPlugins" AfterTargets="Build" Condition="'$(DeployToPeak)' == 'true'">
+    <PropertyGroup>
+      <_DeployDir>$([MSBuild]::NormalizeDirectory($(PeakPluginsDir)))</_DeployDir>
+    </PropertyGroup>
+    <Error
+      Text="DeployToPeak=true but PeakPluginsDir '$(_DeployDir)' does not exist. Create it or pass -p:PeakPluginsDir=..."
+      Condition="!Exists('$(_DeployDir)')"
+    />
+    <Message Text="Deploy → $(_DeployDir)$(TargetFileName)" Importance="High" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(_DeployDir)" />
+  </Target>
+
+  <!--
+    Build Thunderstore package:
+      dotnet build -c Release -target:PackTS -v d
+  -->
+  <Target Name="PackTS" DependsOnTargets="Build" Condition="$(ThunderstorePackable) != 'false'">
+    <Error
+      Text="PackTS must be called with Release configuration."
+      Condition="'$(Configuration)' != 'Release'"
+    />
+    <PropertyGroup>
+      <BuildArgument Condition="'$(PublishTS)' != 'true'">build</BuildArgument>
+      <BuildArgument Condition="'$(PublishTS)' == 'true'">publish</BuildArgument>
+    </PropertyGroup>
+    <Exec Command="dotnet tool restore" />
+    <Exec Command="dotnet tcli $(BuildArgument) --package-version $(Version)" />
+  </Target>
+</Project>
