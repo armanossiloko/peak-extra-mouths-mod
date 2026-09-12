@@ -65,7 +65,9 @@ Optional overrides: copy `Config.Build.user.props.example` → `Config.Build.use
 Every push to `master` runs [.github/workflows/thunderstore.yml](.github/workflows/thunderstore.yml):
 
 1. Builds a Thunderstore ZIP (using stripped [PEAKGameLibs](https://www.nuget.org/packages/PEAKGameLibs) for compile references)
-2. Uploads it as a workflow **artifact** you can download and upload manually
+2. Uploads a workflow artifact named **`ExtraMouths-ExtraMouths`**
+
+Download that artifact and upload the resulting `ExtraMouths-ExtraMouths.zip` straight to Thunderstore — no unpacking/repacking needed.
 
 ### Manual publish from Actions
 
